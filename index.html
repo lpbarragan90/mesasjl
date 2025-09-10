@@ -1,12 +1,11 @@
 
-<!DOCTYPE html>
-
+<!doctype html>
 <html lang="es">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport"/>
-<title>Mapa de Mesas (Móvil + Roles Abreviados + Iconos)</title>
-<style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>Mapa de Mesas (Móvil + Roles Abreviados + Iconos)</title>
+  <style>
     :root{
       --seat-size: 56px;
       --wrap-size: 100vw;
@@ -70,64 +69,53 @@
     .status { position: sticky; top:0; z-index:5; }
     .counter { font-size: 12px; color:#475569; margin-bottom: 8px; }
   </style>
-
-<link href="manifest.webmanifest" rel="manifest"/>
-<meta content="#111827" name="theme-color"/>
-<meta content="yes" name="apple-mobile-web-app-capable"/>
-<meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
-<link href="icons/icon-192.png" rel="apple-touch-icon"/>
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js').catch(console.error);
-    });
-  }
-</script>
 </head>
 <body>
-<header>
-<button class="btn" id="openDrawer">Invitados</button>
-<h1>Mesas (Móvil)</h1>
-<div style="flex:1"></div>
-<button class="btn" id="exportPDF">PDF</button>
-<button class="btn" id="exportXLSX">Excel</button>
-<button class="btn" id="exportCSV">CSV</button>
-</header>
-<div class="main">
-<div class="status" id="status"></div>
-<div class="grid" id="app"></div>
-</div>
-<div class="bottombar">
-<button class="btn primary" id="save">Guardar</button>
-<button class="btn" id="undo">Deshacer</button>
-<button class="btn" id="import">Importar</button>
-<button class="btn" id="exportJSON">Exportar</button>
-</div>
-<input accept=".json" id="fileInput" style="display:none" type="file"/>
-<div class="drawer" id="drawer">
-<header>
-<strong>Invitados</strong>
-<button class="btn" id="closeDrawer">Cerrar</button>
-</header>
-<div class="body">
-<div class="side-search">
-<input id="searchGuest" placeholder="Buscar invitado o grupo..." type="text"/>
-<button class="btn" id="btnSearch">Buscar</button>
-<button class="btn" id="clearSearch">X</button>
-</div>
-<div class="counter" id="counter"></div>
-<div class="small muted">Asignados se ocultan automáticamente. Edita nombres aquí. No se permiten <strong>nombres duplicados</strong>.</div>
-<div id="guestList"></div>
-</div>
-</div>
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <header>
+    <button id="openDrawer" class="btn">Invitados</button>
+    <h1>Mesas (Móvil)</h1>
+    <div style="flex:1"></div>
+    <button id="exportPDF" class="btn">PDF</button>
+    <button id="exportXLSX" class="btn">Excel</button>
+    <button id="exportCSV" class="btn">CSV</button>
+  </header>
 
-<script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore-compat.js"></script>
-<script>
-    const STORAGE_KEY = "plan_mesas_jl_pwa_sync_v1"; // new key for this version
+  <div class="main">
+    <div id="status" class="status"></div>
+    <div id="app" class="grid"></div>
+  </div>
+
+  <div class="bottombar">
+    <button id="save" class="btn primary">Guardar</button>
+    <button id="undo" class="btn">Deshacer</button>
+    <button id="import" class="btn">Importar</button>
+    <button id="exportJSON" class="btn">Exportar</button>
+  </div>
+  <input type="file" id="fileInput" accept=".json" style="display:none">
+
+  <div id="drawer" class="drawer">
+    <header>
+      <strong>Invitados</strong>
+      <button id="closeDrawer" class="btn">Cerrar</button>
+    </header>
+    <div class="body">
+      <div class="side-search">
+        <input type="text" id="searchGuest" placeholder="Buscar invitado o grupo...">
+        <button id="btnSearch" class="btn">Buscar</button>
+        <button id="clearSearch" class="btn">X</button>
+      </div>
+      <div class="counter" id="counter"></div>
+      <div class="small muted">Asignados se ocultan automáticamente. Edita nombres aquí. No se permiten <strong>nombres duplicados</strong>.</div>
+      <div id="guestList"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+  <script>
+    const STORAGE_KEY = "plan_mesas_jl_v4"; // new key for this version
     const PEOPLE_ORIG = {"1": {"Nombre": "Nora Sanchez", "GRUPO": "FAMILIA JENNY"}, "2": {"Nombre": "Rafael Barradas Palmeros", "GRUPO": "FAMILIA JENNY"}, "3": {"Nombre": "Raquel Sánchez Ortiz", "GRUPO": "FAMILIA JENNY"}, "4": {"Nombre": "Román Sánchez Ortíz", "GRUPO": "FAMILIA JENNY"}, "5": {"Nombre": "Roxana Aguirre Aldana", "GRUPO": "FAMILIA JENNY"}, "6": {"Nombre": "Santa Teresa Sánchez Ortíz", "GRUPO": "FAMILIA JENNY"}, "7": {"Nombre": "Sergio Barbabosa Sánchez", "GRUPO": "FAMILIA JENNY"}, "8": {"Nombre": "Sergio barbabosa gonzalez", "GRUPO": "FAMILIA JENNY"}, "9": {"Nombre": "Shani Yaminah Andrade García", "GRUPO": "FAMILIA JENNY"}, "10": {"Nombre": "Susana Guadalupe Mtz Caraza", "GRUPO": "FAMILIA JENNY"}, "11": {"Nombre": "Invitado Esmeralda 1", "GRUPO": "FAMILIA JENNY"}, "12": {"Nombre": "Invitado Tio Roman 1", "GRUPO": "FAMILIA JENNY"}, "13": {"Nombre": "Invitado Tio Roman 2", "GRUPO": "FAMILIA JENNY"}, "14": {"Nombre": "Isabel", "GRUPO": "FAMILIA JENNY"}, "15": {"Nombre": "Jesus Guerrero López", "GRUPO": "FAMILIA JENNY"}, "16": {"Nombre": "José Alberto Caraza Aldana", "GRUPO": "FAMILIA JENNY"}, "17": {"Nombre": "Laura Patricia Barradas Sánchez", "GRUPO": "FAMILIA JENNY"}, "18": {"Nombre": "Leticia Barradas Sánchez", "GRUPO": "FAMILIA JENNY"}, "19": {"Nombre": "María de la Paz Sánchez Ortíz", "GRUPO": "FAMILIA JENNY"}, "20": {"Nombre": "Maríana Martínez Caraza", "GRUPO": "FAMILIA JENNY"}, "21": {"Nombre": "Alberto Caraza Sánchez", "GRUPO": "FAMILIA JENNY"}, "22": {"Nombre": "Alejandro Barradas Sanchez", "GRUPO": "FAMILIA JENNY"}, "23": {"Nombre": "Angelica García Leal", "GRUPO": "FAMILIA JENNY"}, "24": {"Nombre": "Cesar Sánchez Torres", "GRUPO": "FAMILIA JENNY"}, "25": {"Nombre": "Eduardo Caraza", "GRUPO": "FAMILIA JENNY"}, "26": {"Nombre": "Esmeralda Anaid Barbabosa Sánchez", "GRUPO": "FAMILIA JENNY"}, "27": {"Nombre": "Evelia Aldana Tapia", "GRUPO": "FAMILIA JENNY"}, "28": {"Nombre": "Gloria Caraza Aldana", "GRUPO": "FAMILIA JENNY"}, "29": {"Nombre": "Guadalupe  Delgado Rosado", "GRUPO": "FAMILIA JENNY"}, "30": {"Nombre": "Invitado 3", "GRUPO": "FAMILIA JENNY"}, "31": {"Nombre": "Ariz Arteaga Sánchez", "GRUPO": "FAMILIA JENNY"}, "32": {"Nombre": "Gerardo Garreon Falfan", "GRUPO": "FAMILIA JENNY"}, "33": {"Nombre": "Margarita Enriquez", "GRUPO": "FAMILIA JENNY"}, "34": {"Nombre": "Matilde Dominguez Ledezma", "GRUPO": "FAMILIA JENNY"}, "35": {"Nombre": "Rosa Elba Sánchez Ortíz", "GRUPO": "FAMILIA JENNY"}, "36": {"Nombre": "Alejandro Medina Granados", "GRUPO": "FAMILIA LUIS"}, "37": {"Nombre": "Arlette Lorenzo Moreno", "GRUPO": "FAMILIA LUIS"}, "38": {"Nombre": "Felix Esposo de Raquel", "GRUPO": "FAMILIA LUIS"}, "39": {"Nombre": "Manuela del Carmen Morales Moreno", "GRUPO": "FAMILIA LUIS"}, "40": {"Nombre": "Raquel Morales Garcia", "GRUPO": "FAMILIA LUIS"}, "41": {"Nombre": "Andrea Islas Martínez", "GRUPO": "FAMILIA LUIS"}, "42": {"Nombre": "Claudia Martínez Moreno", "GRUPO": "FAMILIA LUIS"}, "43": {"Nombre": "David Morales Moreno", "GRUPO": "FAMILIA LUIS"}, "44": {"Nombre": "Francisco Morales", "GRUPO": "FAMILIA LUIS"}, "45": {"Nombre": "Héctor islas", "GRUPO": "FAMILIA LUIS"}, "46": {"Nombre": "Isabel toto", "GRUPO": "FAMILIA LUIS"}, "47": {"Nombre": "José Manuel Zúñiga", "GRUPO": "FAMILIA LUIS"}, "48": {"Nombre": "José Santiago Aranda Balderas", "GRUPO": "FAMILIA LUIS"}, "49": {"Nombre": "María del Rosario García", "GRUPO": "FAMILIA LUIS"}, "50": {"Nombre": "Tia Martiza", "GRUPO": "FAMILIA LUIS"}, "51": {"Nombre": "Ana Judith Moreno Garcia", "GRUPO": "FAMILIA LUIS"}, "52": {"Nombre": "Enrique Lorenzo Moreno", "GRUPO": "FAMILIA LUIS"}, "53": {"Nombre": "Estefanía Calderon Staines", "GRUPO": "FAMILIA LUIS"}, "54": {"Nombre": "Guadalupe Alanis", "GRUPO": "FAMILIA LUIS"}, "55": {"Nombre": "Marilu garcia gomez", "GRUPO": "FAMILIA LUIS"}, "56": {"Nombre": "Martha Aguilar", "GRUPO": "FAMILIA LUIS"}, "57": {"Nombre": "Montserrat Alanis", "GRUPO": "FAMILIA LUIS"}, "58": {"Nombre": "Oscar Lorenzo Moreno", "GRUPO": "FAMILIA LUIS"}, "59": {"Nombre": "Pablo Gerardo Morales Aguilar", "GRUPO": "FAMILIA LUIS"}, "60": {"Nombre": "Xochilt Moreno García", "GRUPO": "FAMILIA LUIS"}, "61": {"Nombre": "Enfermera Tia Judith", "GRUPO": "FAMILIA LUIS"}, "62": {"Nombre": "José Fernando Rodriguez Morales", "GRUPO": "FAMILIA LUIS"}, "63": {"Nombre": "María Estela Pérez", "GRUPO": "FAMILIA LUIS"}, "64": {"Nombre": "Nicolas Medina Lorenzo", "GRUPO": "FAMILIA LUIS"}, "65": {"Nombre": "Ninfa Ojeda", "GRUPO": "FAMILIA LUIS"}, "66": {"Nombre": "Regina Medina Lorenzo", "GRUPO": "FAMILIA LUIS"}, "67": {"Nombre": "Rosa Isela Morales Moreno", "GRUPO": "FAMILIA LUIS"}, "68": {"Nombre": "Adriana Schiffer Figueroa", "GRUPO": "SCOTIA"}, "69": {"Nombre": "Fernanda novia de Omar", "GRUPO": "SCOTIA"}, "70": {"Nombre": "Omar Saavedra Sanchéz", "GRUPO": "SCOTIA"}, "71": {"Nombre": "Antonio Gonzalez Gutiérrez", "GRUPO": "SCOTIA"}, "72": {"Nombre": "Enrique Almaraz Villegas", "GRUPO": "SCOTIA"}, "73": {"Nombre": "Esposa Enrique Almaraz", "GRUPO": "SCOTIA"}, "74": {"Nombre": "Fernando de la Peza Zermeño", "GRUPO": "SCOTIA"}, "75": {"Nombre": "Juan Antonio Carrancedo", "GRUPO": "SCOTIA"}, "76": {"Nombre": "Laura Enriquez Musi", "GRUPO": "SCOTIA"}, "77": {"Nombre": "Norma Sánchez Valenzuela", "GRUPO": "SCOTIA"}, "78": {"Nombre": "Oscar Cruz Cruz", "GRUPO": "SCOTIA"}, "79": {"Nombre": "Ricardo Aguilar Moran", "GRUPO": "SCOTIA"}, "80": {"Nombre": "Samantha Hernández Zamora", "GRUPO": "SCOTIA"}, "81": {"Nombre": "Alejandro Riva Palacio Friederichsen", "GRUPO": "SCOTIA"}, "82": {"Nombre": "Cristina Villalobos", "GRUPO": "SCOTIA"}, "83": {"Nombre": "Daniel Rebollar Barrera", "GRUPO": "SCOTIA"}, "84": {"Nombre": "Esposa de Humberto", "GRUPO": "SCOTIA"}, "85": {"Nombre": "Gilberto Cabral Haro", "GRUPO": "SCOTIA"}, "86": {"Nombre": "Humberto Aliseda Marin", "GRUPO": "SCOTIA"}, "87": {"Nombre": "Novia de Gilberto", "GRUPO": "SCOTIA"}, "88": {"Nombre": "Quetzal Sierra", "GRUPO": "SCOTIA"}, "89": {"Nombre": "Susana esposa de Alejandro", "GRUPO": "SCOTIA"}, "90": {"Nombre": "Thalia Osorno Garcia", "GRUPO": "SCOTIA"}, "91": {"Nombre": "Valeria Arteaga Restrepo", "GRUPO": "AMIGA CERCANA"}, "92": {"Nombre": "Yali Valencia Uscanga", "GRUPO": "AMIGA CERCANA"}, "93": {"Nombre": "Alejandro Campos Castellanos", "GRUPO": "SCOTIA"}, "94": {"Nombre": "Esposo Rossana", "GRUPO": "SCOTIA"}, "95": {"Nombre": "Félix Villagran Aguilera", "GRUPO": "SCOTIA"}, "96": {"Nombre": "Mariana Moreno Arjona", "GRUPO": "SCOTIA"}, "97": {"Nombre": "Rosalia Mena Farfan", "GRUPO": "SCOTIA"}, "98": {"Nombre": "Rossana Lagunes Zaldivar", "GRUPO": "SCOTIA"}, "99": {"Nombre": "Stephanie Jimenez Mendoza", "GRUPO": "SCOTIA"}, "100": {"Nombre": "Tulio Alberto de Nova Ferreiro", "GRUPO": "SCOTIA"}, "101": {"Nombre": "Invitado Lila", "GRUPO": "AMIGA CERCANA"}, "102": {"Nombre": "Invitado Valeria", "GRUPO": "AMIGA CERCANA"}, "103": {"Nombre": "Isis González", "GRUPO": "AMIGA CERCANA"}, "104": {"Nombre": "Jorge Malpica", "GRUPO": "AMIGA CERCANA"}, "105": {"Nombre": "Leyci Salomon Morales", "GRUPO": "AMIGA CERCANA"}, "106": {"Nombre": "María Fernanda Reva Gil", "GRUPO": "AMIGA CERCANA"}, "107": {"Nombre": "Moises Thomas Meunier", "GRUPO": "AMIGA CERCANA"}, "108": {"Nombre": "Olga Vanery Alarcon Sánchez", "GRUPO": "AMIGA CERCANA"}, "109": {"Nombre": "Selene Valencia Uscanga", "GRUPO": "AMIGA CERCANA"}, "110": {"Nombre": "Tomas Méndez Gutiérrez", "GRUPO": "AMIGA CERCANA"}, "111": {"Nombre": "Alejandro morales", "GRUPO": "AMIGA CERCANA"}, "112": {"Nombre": "Alma Lilia Quintero Morales", "GRUPO": "AMIGA CERCANA"}, "113": {"Nombre": "Angel Teutli", "GRUPO": "AMIGA CERCANA"}, "114": {"Nombre": "Felipe Gutiérrez Altamirano", "GRUPO": "AMIGA CERCANA"}, "115": {"Nombre": "Francisco Toledo Mtz.", "GRUPO": "AMIGA CERCANA"}, "116": {"Nombre": "Invitado Monss", "GRUPO": "AMIGA CERCANA"}, "117": {"Nombre": "Jessica Grahanda Cristaldi", "GRUPO": "AMIGA CERCANA"}, "118": {"Nombre": "Karen Fernández Peguero", "GRUPO": "AMIGA CERCANA"}, "119": {"Nombre": "Mary Velazquez García", "GRUPO": "AMIGA CERCANA"}, "120": {"Nombre": "Monserrat Arevalo Pena", "GRUPO": "AMIGA CERCANA"}, "121": {"Nombre": "Alfonso López Arellano", "GRUPO": "AMIGA CERCANA"}, "122": {"Nombre": "Ana Zárate Gonzalez", "GRUPO": "AMIGA CERCANA"}, "123": {"Nombre": "Angie Monrroy", "GRUPO": "AMIGA CERCANA"}, "124": {"Nombre": "Diego Riojas Malo", "GRUPO": "AMIGO"}, "125": {"Nombre": "Fernando Basurto Longo", "GRUPO": "AMIGO"}, "126": {"Nombre": "Guillermo Ziaurriz", "GRUPO": "AMIGO"}, "127": {"Nombre": "Mariana Riojas Malo", "GRUPO": "AMIGO"}, "128": {"Nombre": "Mario Riojas", "GRUPO": "AMIGO"}, "129": {"Nombre": "Sandra Rodríguez Diaz", "GRUPO": "AMIGO"}, "130": {"Nombre": "Yolanda Malo", "GRUPO": "AMIGO"}, "131": {"Nombre": "Daniel Rodríguez", "GRUPO": "AMIGO"}, "132": {"Nombre": "Daniela chapa", "GRUPO": "AMIGO"}, "133": {"Nombre": "Esposa de Ricardo Ortiz", "GRUPO": "AMIGO"}, "134": {"Nombre": "Gabriela Capetillo", "GRUPO": "AMIGO"}, "135": {"Nombre": "Javier Francisco Saldaña Gonzalez", "GRUPO": "AMIGO"}, "136": {"Nombre": "Jorge Arrieta", "GRUPO": "AMIGO"}, "137": {"Nombre": "Leonora Téllez", "GRUPO": "AMIGO"}, "138": {"Nombre": "Ricardo Ortíz", "GRUPO": "AMIGO"}, "139": {"Nombre": "Uriel Larios Ojeda", "GRUPO": "AMIGO"}, "140": {"Nombre": "Yamile Croda", "GRUPO": "AMIGO"}, "141": {"Nombre": "Alejandro Alarcon", "GRUPO": "AMIGO"}, "142": {"Nombre": "Antonio Alexis Arroyo", "GRUPO": "AMIGO"}, "143": {"Nombre": "Daniel Cienfuegos", "GRUPO": "AMIGO"}, "144": {"Nombre": "Edgar Ferman", "GRUPO": "AMIGO"}, "145": {"Nombre": "Ingrid Lenz", "GRUPO": "AMIGO"}, "146": {"Nombre": "Miguel Ángel Hernández", "GRUPO": "AMIGO"}, "147": {"Nombre": "Sra Grace esposa de saldaña", "GRUPO": "AMIGO"}, "148": {"Nombre": "Ulises Gonzalez", "GRUPO": "AMIGO"}, "149": {"Nombre": "Cristina Basurto Longo", "GRUPO": "AMIGO CERCANO"}, "150": {"Nombre": "Gerardo Téllez Ruiz", "GRUPO": "AMIGO CERCANO"}, "151": {"Nombre": "Aldo Fong Rodríguez", "GRUPO": "AMIGO CERCANO"}, "152": {"Nombre": "Alejandro Cuesta García", "GRUPO": "AMIGO CERCANO"}, "153": {"Nombre": "Ana Elisa Mares Villegas", "GRUPO": "AMIGO CERCANO"}, "154": {"Nombre": "Arturo Escobar", "GRUPO": "AMIGO CERCANO"}, "155": {"Nombre": "Blanca María Urrea Valdez", "GRUPO": "AMIGO CERCANO"}, "156": {"Nombre": "Karen Córdoba", "GRUPO": "AMIGO CERCANO"}, "157": {"Nombre": "Luis Alberto Larios Ojeda", "GRUPO": "AMIGO CERCANO"}, "158": {"Nombre": "Mario Arenas", "GRUPO": "AMIGO CERCANO"}, "159": {"Nombre": "Raquel Colorado Subizar", "GRUPO": "AMIGO CERCANO"}, "160": {"Nombre": "Vania Suzette Martinez Cortés", "GRUPO": "AMIGO CERCANO"}, "161": {"Nombre": "Daniel Basurto Longo", "GRUPO": "AMIGO CERCANO"}, "162": {"Nombre": "Esposa Razo", "GRUPO": "AMIGO CERCANO"}, "163": {"Nombre": "Francisco Razo", "GRUPO": "AMIGO CERCANO"}, "164": {"Nombre": "Luis Felipe Higueras Reyes", "GRUPO": "AMIGO CERCANO"}, "165": {"Nombre": "Carlos Rodríguez Marroquin", "GRUPO": "AMIGO PAPA"}, "166": {"Nombre": "Gabriela cuevas cortes", "GRUPO": "AMIGO PAPA"}, "167": {"Nombre": "José David Reyna", "GRUPO": "AMIGO PAPA"}, "168": {"Nombre": "Lizbeth Ramírez de David", "GRUPO": "AMIGO PAPA"}, "169": {"Nombre": "Raul Peña Gurrion", "GRUPO": "AMIGO PAPA"}, "170": {"Nombre": "Sonia Zetina Gomez", "GRUPO": "AMIGO PAPA"}, "171": {"Nombre": "Alma Regalado Ávila", "GRUPO": "AMIGO PAPA"}, "172": {"Nombre": "Andrés Gutiérrez cruz", "GRUPO": "AMIGO PAPA"}, "173": {"Nombre": "Francisco Zárate Cano", "GRUPO": "AMIGO PAPA"}, "174": {"Nombre": "Georgiana escobar avula", "GRUPO": "AMIGO PAPA"}, "175": {"Nombre": "Invitado Sra Juanita", "GRUPO": "AMIGO PAPA"}, "176": {"Nombre": "Josefa Suárez Díaz", "GRUPO": "AMIGO PAPA"}, "177": {"Nombre": "Juanita Sánchez Pérez", "GRUPO": "AMIGO PAPA"}, "178": {"Nombre": "Mariela  Herrera Rivadeneyra", "GRUPO": "AMIGO PAPA"}, "179": {"Nombre": "Oscar Ruiz Kat", "GRUPO": "AMIGO PAPA"}, "180": {"Nombre": "Rubicelia Sibaja de Ruiz", "GRUPO": "AMIGO PAPA"}, "181": {"Nombre": "Aldy Ricardez Fonseca", "GRUPO": "AMIGA"}, "182": {"Nombre": "Daniel Charis Carrasco", "GRUPO": "AMIGA"}, "183": {"Nombre": "Invitado Natalia Perez", "GRUPO": "AMIGA"}, "184": {"Nombre": "Jesús Hernández", "GRUPO": "AMIGA"}, "185": {"Nombre": "Juan Perea", "GRUPO": "AMIGA"}, "186": {"Nombre": "Leydi Martinez Jimenez", "GRUPO": "AMIGA"}, "187": {"Nombre": "Natalia Pérez", "GRUPO": "AMIGA"}, "188": {"Nombre": "Nay Acosta", "GRUPO": "AMIGA"}, "189": {"Nombre": "Raul Carranco", "GRUPO": "AMIGA"}, "190": {"Nombre": "Ximena Aguillon", "GRUPO": "AMIGA"}, "191": {"Nombre": "Bruno Doerrer", "GRUPO": "ALEMANES"}, "192": {"Nombre": "Daniel Doerrer", "GRUPO": "ALEMANES"}, "193": {"Nombre": "Jonas Moeckel", "GRUPO": "ALEMANES"}, "194": {"Nombre": "Lissy Doerrer", "GRUPO": "ALEMANES"}, "195": {"Nombre": "Steffy Doerrer", "GRUPO": "ALEMANES"}, "196": {"Nombre": "Annie Lopez del Castillo", "GRUPO": "AMIGA"}, "197": {"Nombre": "Edgar eduardo vargas montero", "GRUPO": "AMIGA"}, "198": {"Nombre": "Jesús Méndez", "GRUPO": "AMIGA"}, "199": {"Nombre": "Pamela Pérez Solorzano", "GRUPO": "AMIGA"}, "200": {"Nombre": "Samantha Perez Villegas", "GRUPO": "AMIGA"}};
     const SEATS_ORIG = {"1": [{"Seat": 1, "ID": null, "ROL": "INV"}, {"Seat": 2, "ID": null, "ROL": "INV"}, {"Seat": 3, "ID": null, "ROL": "INV"}, {"Seat": 4, "ID": null, "ROL": "INV"}, {"Seat": 5, "ID": null, "ROL": "INV"}, {"Seat": 6, "ID": null, "ROL": "INV"}, {"Seat": 7, "ID": null, "ROL": "INV"}, {"Seat": 8, "ID": null, "ROL": "INV"}, {"Seat": 9, "ID": null, "ROL": "INV"}, {"Seat": 10, "ID": null, "ROL": "INV"}], "2": [{"Seat": 1, "ID": null, "ROL": "INV"}, {"Seat": 2, "ID": null, "ROL": "INV"}, {"Seat": 3, "ID": null, "ROL": "INV"}, {"Seat": 4, "ID": null, "ROL": "INV"}, {"Seat": 5, "ID": null, "ROL": "INV"}, {"Seat": 6, "ID": null, "ROL": "INV"}, {"Seat": 7, "ID": null, "ROL": "INV"}, {"Seat": 8, "ID": null, "ROL": "INV"}, {"Seat": 9, "ID": null, "ROL": "INV"}, {"Seat": 10, "ID": null, "ROL": "INV"}], "3": [{"Seat": 1, "ID": null, "ROL": "INV"}, {"Seat": 2, "ID": null, "ROL": "INV"}, {"Seat": 3, "ID": null, "ROL": "INV"}, {"Seat": 4, "ID": null, "ROL": "INV"}, {"Seat": 5, "ID": null, "ROL": "INV"}, {"Seat": 6, "ID": null, "ROL": "INV"}, {"Seat": 7, "ID": null, "ROL": "INV"}, {"Seat": 8, "ID": null, "ROL": "INV"}, {"Seat": 9, "ID": null, "ROL": "INV"}, {"Seat": 10, "ID": null, "ROL": "INV"}], "4": [{"Seat": 1, "ID": null, "ROL": "INV"}, {"Seat": 2, "ID": null, "ROL": "INV"}, {"Seat": 3, "ID": null, "ROL": "INV"}, {"Seat": 4, "ID": null, "ROL": "INV"}, {"Seat": 5, "ID": null, "ROL": "INV"}, {"Seat": 6, "ID": null, "ROL": "INV"}, {"Seat": 7, "ID": null, "ROL": "INV"}, {"Seat": 8, "ID": null, "ROL": "INV"}, {"Seat": 9, "ID": null, "ROL": "INV"}, {"Seat": 10, "ID": null, "ROL": "INV"}], "5": [{"Seat": 1, "ID": null, "ROL": "INV"}, {"Seat": 2, "ID": null, "ROL": "INV"}, {"Seat": 3, "ID": null, "ROL": "INV"}, {"Seat": 4, "ID": null, "ROL": "INV"}, {"Seat": 5, "ID": null, "ROL": "INV"}, {"Seat": 6, "ID": null, "ROL": "INV"}, {"Seat": 7, "ID": null, "ROL": "INV"}, {"Seat": 8, "ID": null, "ROL": "INV"}, {"Seat": 9, "ID": null, "ROL": "INV"}, {"Seat": 10, "ID": null, "ROL": "INV"}], "6": [{"Seat": 1, "ID": null, "ROL": "INV"}, {"Seat": 2, "ID": null, "ROL": "INV"}, {"Seat": 3, "ID": null, "ROL": "INV"}, {"Seat": 4, "ID": null, "ROL": "INV"}, {"Seat": 5, "ID": null, "ROL": "INV"}, {"Seat": 6, "ID": null, "ROL": "INV"}, {"Seat": 7, "ID": null, "ROL": "INV"}, {"Seat": 8, "ID": null, "ROL": "INV"}, {"Seat": 9, "ID": null, "ROL": "INV"}, {"Seat": 10, "ID": null, "ROL": "INV"}], "7": [{"Seat": 1, "ID": null, "ROL": "INV"}, {"Seat": 2, "ID": null, "ROL": "INV"}, {"Seat": 3, "ID": null, "ROL": "INV"}, {"Seat": 4, "ID": null, "ROL": "INV"}, {"Seat": 5, "ID": null, "ROL": "INV"}, {"Seat": 6, "ID": null, "ROL": "INV"}, {"Seat": 7, "ID": null, "ROL": "INV"}, {"Seat": 8, "ID": null, "ROL": "INV"}, {"Seat": 9, "ID": null, "ROL": "INV"}, {"Seat": 10, "ID": null, "ROL": "INV"}], "8": [{"Seat": 1, "ID": null, "ROL": "INV"}, {"Seat": 2, "ID": null, "ROL": "INV"}, {"Seat": 3, "ID": null, "ROL": "INV"}, {"Seat": 4, "ID": null, "ROL": "INV"}, {"Seat": 5, "ID": null, "ROL": "INV"}, {"Seat": 6, "ID": null, "ROL": "INV"}, {"Seat": 7, "ID": null, "ROL": "INV"}, {"Seat": 8, "ID": null, "ROL": "INV"}, {"Seat": 9, "ID": null, "ROL": "INV"}, {"Seat": 10, "ID": null, "ROL": "INV"}], "9": [{"Seat": 1, "ID": null, "ROL": "INV"}, {"Seat": 2, "ID": null, "ROL": "INV"}, {"Seat": 3, "ID": null, "ROL": "INV"}, {"Seat": 4, "ID": null, "ROL": "INV"}, {"Seat": 5, "ID": null, "ROL": "INV"}, {"Seat": 6, "ID": null, "ROL": "INV"}, {"Seat": 7, "ID": null, "ROL": "INV"}, {"Seat": 8, "ID": null, "ROL": "INV"}, {"Seat": 9, "ID": null, "ROL": "INV"}, {"Seat": 10, "ID": null, "ROL": "INV"}], "10": [{"Seat": 1, "ID": null, "ROL": "INV"}, {"Seat": 2, "ID": null, "ROL": "INV"}, {"Seat": 3, "ID": null, "ROL": "INV"}, {"Seat": 4, "ID": null, "ROL": "INV"}, {"Seat": 5, "ID": null, "ROL": "INV"}, {"Seat": 6, "ID": null, "ROL": "INV"}, {"Seat": 7, "ID": null, "ROL": "INV"}, {"Seat": 8, "ID": null, "ROL": "INV"}, {"Seat": 9, "ID": null, "ROL": "INV"}, {"Seat": 10, "ID": null, "ROL": "INV"}], "11": [{"Seat": 1, "ID": null, "ROL": "INV"}, {"Seat": 2, "ID": null, "ROL": "INV"}, {"Seat": 3, "ID": null, "ROL": "INV"}, {"Seat": 4, "ID": null, "ROL": "INV"}, {"Seat": 5, "ID": null, "ROL": "INV"}, {"Seat": 6, "ID": null, "ROL": "INV"}, {"Seat": 7, "ID": null, "ROL": "INV"}, {"Seat": 8, "ID": null, "ROL": "INV"}, {"Seat": 9, "ID": null, "ROL": "INV"}, {"Seat": 10, "ID": null, "ROL": "INV"}], "12": [{"Seat": 1, "ID": null, "ROL": "INV"}, {"Seat": 2, "ID": null, "ROL": "INV"}, {"Seat": 3, "ID": null, "ROL": "INV"}, {"Seat": 4, "ID": null, "ROL": "INV"}, {"Seat": 5, "ID": null, "ROL": "INV"}, {"Seat": 6, "ID": null, "ROL": "INV"}, {"Seat": 7, "ID": null, "ROL": "INV"}, {"Seat": 8, "ID": null, "ROL": "INV"}, {"Seat": 9, "ID": null, "ROL": "INV"}, {"Seat": 10, "ID": null, "ROL": "INV"}], "13": [{"Seat": 1, "ID": null, "ROL": "INV"}, {"Seat": 2, "ID": null, "ROL": "INV"}, {"Seat": 3, "ID": null, "ROL": "INV"}, {"Seat": 4, "ID": null, "ROL": "INV"}, {"Seat": 5, "ID": null, "ROL": "INV"}, {"Seat": 6, "ID": null, "ROL": "INV"}, {"Seat": 7, "ID": null, "ROL": "INV"}, {"Seat": 8, "ID": null, "ROL": "INV"}, {"Seat": 9, "ID": null, "ROL": "INV"}, {"Seat": 10, "ID": null, "ROL": "INV"}], "14": [{"Seat": 1, "ID": null, "ROL": "INV"}, {"Seat": 2, "ID": null, "ROL": "INV"}, {"Seat": 3, "ID": null, "ROL": "INV"}, {"Seat": 4, "ID": null, "ROL": "INV"}, {"Seat": 5, "ID": null, "ROL": "INV"}, {"Seat": 6, "ID": null, "ROL": "INV"}, {"Seat": 7, "ID": null, "ROL": "INV"}, {"Seat": 8, "ID": null, "ROL": "INV"}, {"Seat": 9, "ID": null, "ROL": "INV"}, {"Seat": 10, "ID": null, "ROL": "INV"}], "15": [{"Seat": 1, "ID": null, "ROL": "INV"}, {"Seat": 2, "ID": null, "ROL": "INV"}, {"Seat": 3, "ID": null, "ROL": "INV"}, {"Seat": 4, "ID": null, "ROL": "INV"}, {"Seat": 5, "ID": null, "ROL": "INV"}, {"Seat": 6, "ID": null, "ROL": "INV"}, {"Seat": 7, "ID": null, "ROL": "INV"}, {"Seat": 8, "ID": null, "ROL": "INV"}, {"Seat": 9, "ID": null, "ROL": "INV"}, {"Seat": 10, "ID": null, "ROL": "INV"}], "16": [{"Seat": 1, "ID": null, "ROL": "INV"}, {"Seat": 2, "ID": null, "ROL": "INV"}, {"Seat": 3, "ID": null, "ROL": "INV"}, {"Seat": 4, "ID": null, "ROL": "INV"}, {"Seat": 5, "ID": null, "ROL": "INV"}, {"Seat": 6, "ID": null, "ROL": "INV"}, {"Seat": 7, "ID": null, "ROL": "INV"}, {"Seat": 8, "ID": null, "ROL": "INV"}, {"Seat": 9, "ID": null, "ROL": "INV"}, {"Seat": 10, "ID": null, "ROL": "INV"}], "17": [{"Seat": 1, "ID": null, "ROL": "INV"}, {"Seat": 2, "ID": null, "ROL": "INV"}, {"Seat": 3, "ID": null, "ROL": "INV"}, {"Seat": 4, "ID": null, "ROL": "INV"}, {"Seat": 5, "ID": null, "ROL": "INV"}, {"Seat": 6, "ID": null, "ROL": "INV"}, {"Seat": 7, "ID": null, "ROL": "INV"}, {"Seat": 8, "ID": null, "ROL": "INV"}, {"Seat": 9, "ID": null, "ROL": "INV"}, {"Seat": 10, "ID": null, "ROL": "INV"}], "18": [{"Seat": 1, "ID": null, "ROL": "INV"}, {"Seat": 2, "ID": null, "ROL": "INV"}, {"Seat": 3, "ID": null, "ROL": "INV"}, {"Seat": 4, "ID": null, "ROL": "INV"}, {"Seat": 5, "ID": null, "ROL": "INV"}, {"Seat": 6, "ID": null, "ROL": "INV"}, {"Seat": 7, "ID": null, "ROL": "INV"}, {"Seat": 8, "ID": null, "ROL": "INV"}, {"Seat": 9, "ID": null, "ROL": "INV"}, {"Seat": 10, "ID": null, "ROL": "INV"}], "19": [{"Seat": 1, "ID": null, "ROL": "INV"}, {"Seat": 2, "ID": null, "ROL": "INV"}, {"Seat": 3, "ID": null, "ROL": "INV"}, {"Seat": 4, "ID": null, "ROL": "INV"}, {"Seat": 5, "ID": null, "ROL": "INV"}, {"Seat": 6, "ID": null, "ROL": "INV"}, {"Seat": 7, "ID": null, "ROL": "INV"}, {"Seat": 8, "ID": null, "ROL": "INV"}, {"Seat": 9, "ID": null, "ROL": "INV"}, {"Seat": 10, "ID": null, "ROL": "INV"}], "20": [{"Seat": 1, "ID": null, "ROL": "INV"}, {"Seat": 2, "ID": null, "ROL": "INV"}, {"Seat": 3, "ID": null, "ROL": "INV"}, {"Seat": 4, "ID": null, "ROL": "INV"}, {"Seat": 5, "ID": null, "ROL": "INV"}, {"Seat": 6, "ID": null, "ROL": "INV"}, {"Seat": 7, "ID": null, "ROL": "INV"}, {"Seat": 8, "ID": null, "ROL": "INV"}, {"Seat": 9, "ID": null, "ROL": "INV"}, {"Seat": 10, "ID": null, "ROL": "INV"}]};
     const MESAS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
@@ -516,76 +504,6 @@
       pdf.save('Asignacion_Mesas.pdf');
     }
 
-    
-    // ======== FIRESTORE SYNC (Realtime) ========
-    // Reemplaza este objeto con tu configuración real de Firebase (Project settings → General → Your apps → Web app).
-    const FIREBASE_CONFIG = {
-      apiKey: "REPLACE_API_KEY",
-      authDomain: "REPLACE_PROJECT_ID.firebaseapp.com",
-      projectId: "REPLACE_PROJECT_ID",
-      // Si tienes otros campos en tu config (storageBucket, appId, etc.) puedes agregarlos también.
-    };
-
-    // Lee PLAN_ID de hash o usa el default
-    const URL_PLAN = (new URL(location.href).hash.replace('#','').trim()) || '';
-    const PLAN_ID = URL_PLAN || 'plan-jl-default';
-
-    // Flag para habilitar/deshabilitar sync (por si quieres trabajar offline sin replicar)
-    const SYNC = true;
-
-    try {
-      firebase.initializeApp(FIREBASE_CONFIG);
-    } catch(e){ /* ya inicializado */ }
-    const db = firebase.firestore();
-    const docRef = db.collection('plans').doc(PLAN_ID);
-
-    let applyingRemote = false;
-
-    // Subida a la nube (debounced)
-    function pushCloud(){
-      if (!SYNC) return;
-      if (applyingRemote) return;
-      const data = snapshot();
-      docRef.set(data, { merge: true }).catch(err => console.warn('Push cloud error', err));
-    }
-    const pushCloudDebounced = (fn => {
-      let t = null;
-      return () => { clearTimeout(t); t = setTimeout(() => fn(), 500); };
-    })(pushCloud);
-
-    // Enlazar guardado local + nube
-    const _autoSaveOriginal = autoSave;
-    function autoSave(){
-      _autoSaveOriginal();
-      pushCloudDebounced();
-    }
-
-    async function initCloud(){
-      if (!SYNC) return;
-      try {
-        const first = await docRef.get();
-        if (!first.exists){
-          await docRef.set(snapshot());
-        }
-        docRef.onSnapshot(snap => {
-          if (!snap.exists) return;
-          applyingRemote = true;
-          try {
-            const data = snap.data();
-            // Valida estructura mínima
-            if (data && data.people && data.seats){
-              restore(data);
-            }
-          } finally {
-            applyingRemote = false;
-          }
-        });
-      } catch (e){
-        console.warn('initCloud error', e);
-      }
-    }
-
-
     // Bindings
     document.getElementById('openDrawer').onclick = ()=>{ openDrawer(); };
     document.getElementById('closeDrawer').onclick = ()=>{ closeDrawer(); };
@@ -622,9 +540,6 @@
     document.getElementById('exportPDF').onclick = exportPDF;
 
     render();
-  
-    // Iniciar sync en la nube
-    initCloud();
-</script>
+  </script>
 </body>
 </html>
